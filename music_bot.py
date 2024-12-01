@@ -70,7 +70,7 @@ async def on_wavelink_node_ready(node: wavelink.Node):
 @client.command(description='Connects the bot to the same channel as you', aliases=['c', 'C'])
 async def connect(ctx):
     """Connects the bot to the same channel as you"""
-    vc = ctx.voice_client
+    vc = ctx.message.guild.voice_client
     try:
         channel = ctx.author.voice.channel
     except:
@@ -101,7 +101,7 @@ async def play(ctx, *, search: str):
         vc: CustomPlayer = await ctx.author.voice.channel.connect(cls=custom_player)
         if not vc.playing:
             if vc.autoplay == wavelink.AutoPlayMode.disabled:
-                vc.autoplay = wavelink.AutoPlayMode.enabled
+                vc.autoplay = wavelink.AutoPlayMode.partial
 
             tracks: wavelink.Search = await wavelink.Playable.search(search)
             if isinstance(tracks, wavelink.Playlist):
@@ -180,7 +180,13 @@ async def skip(ctx):
         if vc.queue.is_empty:
             return await vc.stop()
         else:
-            await vc.play(vc.queue.get())
+            track = vc.queue.get()
+            await vc.play(track)
+            await ctx.send(embed=discord.Embed(
+                title=track.title,
+                url=track.uri,
+                description=f'Playing {track.title} in {vc.channel} '
+            ))
         # await vc.skip()
         if vc.paused:
             return await vc.pause(False)
