@@ -122,7 +122,7 @@ async def play(ctx, *, search: str):
                 await vc.play(vc.queue.get())
     else:
         if vc.autoplay == wavelink.AutoPlayMode.disabled:
-            vc.autoplay = wavelink.AutoPlayMode.enabled
+            vc.autoplay = wavelink.AutoPlayMode.partial
 
         tracks: wavelink.Search = await wavelink.Playable.search(search)
         if isinstance(tracks, wavelink.Playlist):
